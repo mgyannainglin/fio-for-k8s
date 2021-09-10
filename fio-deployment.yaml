@@ -1,0 +1,52 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: csi-zfspv-fio
+spec:
+  storageClassName: openebs-zfspv
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fio
+spec:
+  selector:
+    matchLabels:
+      app: fio
+  template:
+    metadata:
+      labels:
+        app: fio
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-dummy-worker0
+      containers:
+      - name: fio
+        image: openebs/tests-fio
+        command: ["/bin/bash"]
+        args: ["-c", "while true ;do sleep 50; done"]
+        volumeMounts:
+          - mountPath: /datadir
+            name: fio-vol
+        tty: true
+        resources:
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+      volumes:
+      - name: fio-vol
+        persistentVolumeClaim:
+          claimName: csi-zfspv-fio
+
+
+#testing command
+#kubectl get pods -n kube-system -l role=openebs-zfs -owide
+#kubectl -nopenebs exec -it fio-65f9b8b6bc-xpfc7 -- fio --name=benchtest --size=800m --filename=/datadir/test --direct=1 --rw=randrw --ioengine=libaio --bs=4k --iodepth=16 --numjobs=8 --time_based --runtime=60
+#zfs list
+#zpool list
+#zpool status
