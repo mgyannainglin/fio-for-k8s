@@ -46,7 +46,7 @@ spec:
 
 #testing command
 #kubectl get pods -n kube-system -l role=openebs-zfs -owide
-#kubectl -nopenebs exec -it fio-65f9b8b6bc-xpfc7 -- fio --name=benchtest --size=800m --filename=/datadir/test --direct=1 --rw=randrw --ioengine=libaio --bs=4k --iodepth=16 --numjobs=8 --time_based --runtime=60
+#kubectl -n{namespace} exec -it {pod-name} -- fio --name=benchtest --size=800m --filename=/datadir/test --direct=1 --rw=randrw --ioengine=libaio --bs=4k --iodepth=16 --numjobs=8 --time_based --runtime=60
 #zfs list
 #zpool list
 #zpool status
